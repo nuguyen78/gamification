@@ -4,6 +4,7 @@ import {
   fetchPlayers as fetchPlayersFromApi,
   fetchOwnItems,
   fetchEquipedItems,
+  equipItem,
 } from '@/api/playerService'
 
 interface Player {
@@ -69,6 +70,35 @@ export const usePlayerStore = defineStore('player', () => {
     fetchPlayers()
   }) */
 
+  async function equipOwnedItem(characterId: number, itemId: string) {
+    try {
+      // 1) send equip request
+      await equipItem(characterId, itemId)
+
+      // 2) locate the item you just equipped
+      const ownIdx = ownItems.value.findIndex(i => i.item_id === itemId)
+      if (ownIdx === -1) {
+        console.warn(`Tried to equip item ${itemId} but it wasn't in ownItems`)
+        return
+      }
+      const newItem = ownItems.value[ownIdx]
+
+      // 3) if there's already something in that same slot, unequip it
+      const oldIdx = equipedItems.value.findIndex(i => i.slot === newItem.slot)
+      if (oldIdx !== -1) {
+        const [oldItem] = equipedItems.value.splice(oldIdx, 1)
+        ownItems.value.push(oldItem)
+      }
+
+      // 4) move the new item into equipedItems
+      ownItems.value.splice(ownIdx, 1)
+      equipedItems.value.push(newItem)
+    } catch (err) {
+      console.error('Equip failed:', err)
+      throw err
+    }
+  }
+
   return {
     players,
     ownItems,
@@ -76,5 +106,6 @@ export const usePlayerStore = defineStore('player', () => {
     fetchPlayers,
     fetchOwnItemsByCharacter,
     fetchEquipedItemsByCharacter,
+    equipOwnedItem,
   }
 })

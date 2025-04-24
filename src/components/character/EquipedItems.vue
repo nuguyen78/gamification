@@ -29,7 +29,7 @@ const ownItems = computed(() => playerStore.ownItems)
 
 <style scoped>
 .grid-container {
-  padding: 2rem;
+  padding: 0rem 2rem 2rem 2rem;
   margin-top: 0rem;
   color: white;
 }

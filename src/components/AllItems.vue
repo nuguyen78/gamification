@@ -1,5 +1,4 @@
 <template>
-    <h1 class="header-text">Owned Items</h1>
     <div class="card">
         <DataTable v-model:filters="filters" :value="ownItems" paginator :rows="10" dataKey="item_id"
             filterDisplay="row" :globalFilterFields="['slot', 'name', 'description', 'bonus']" :loading="loading">
@@ -60,13 +59,6 @@
                     <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by bonus" />
                 </template>
             </Column>
-
-            <!-- Action Column -->
-            <Column header="Actions" style="min-width: 8rem">
-                <template #body="{ data }">
-                    <Button label="Equip" :loading="loadingId === data.item_id" @click="onEquip(data.item_id)" />
-                </template>
-            </Column>
         </DataTable>
     </div>
 </template>
@@ -78,12 +70,8 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import { FilterMatchMode } from '@primevue/core/api';
 import InputText from 'primevue/inputtext';
-import Button from 'primevue/button'
 
 const playerStore = usePlayerStore();
-
-const loadingId = ref<string | null>(null) //TODO
-const CHARACTER_ID = 1  // TODO or pull this from your auth/user store
 
 onMounted(async () => {
     await playerStore.fetchOwnItemsByCharacter(1)
@@ -104,20 +92,24 @@ const filters = ref({
     bonus: { value: null, matchMode: FilterMatchMode.CONTAINS }
 });
 
-async function onEquip(itemId: string) {
-    loadingId.value = itemId
-    try {
-        await playerStore.equipOwnedItem(CHARACTER_ID, itemId)
-        // optionally show a toast/notification here
+/* const getSeverity = (status) => {
+    switch (status) {
+        case 'unqualified':
+            return 'danger';
+
+        case 'qualified':
+            return 'success';
+
+        case 'new':
+            return 'info';
+
+        case 'negotiation':
+            return 'warn';
+
+        case 'renewal':
+            return null;
     }
-    catch (e) {
-        console.error(e)
-        // show error feedback
-    }
-    finally {
-        loadingId.value = null
-    }
-}
+} */
 </script>
 
 <style scoped>
@@ -125,13 +117,5 @@ async function onEquip(itemId: string) {
     padding: 2rem;
     margin-top: 0rem;
     color: white;
-}
-
-.header-text {
-    color: white
-}
-
-.card {
-    border: none;
 }
 </style>

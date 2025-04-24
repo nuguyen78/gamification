@@ -1,25 +1,16 @@
 <template>
-  <!--     <div>
-      <ul v-if="playerStore.players.length">
-        <li v-for="player in playerStore.players" :key="player.id">
-          {{ player.name }} {{ player.surname }}
-        </li>
-      </ul>
-    </div> -->
-  <div class="grid-container">
+  <div class="character-card">
     <div class="avatar-section">
-      <div class="avatar-image-container">
-        <img class="avatar-image" src="@/assets/images/warrior.webp" alt="Placeholder Image" width="" />
-      </div>
+      <img class="avatar-image" src="@/assets/images/warrior.webp" alt="Arthur the Warrior" />
     </div>
     <div class="stats-section">
-      <div class="stat name">Arthur</div>
-      <div class="stat">level: 5</div>
-      <div class="stat">experience: 28/50</div>
-      <div class="stat">
-        Bonuses:
-        <ul class="bonus-list">
-          <li v-for="(bonus, index) in bonuses" :key="index" class="bonus-item">
+      <h2 class="stat name">Arthur</h2>
+      <p class="stat">Level: <span class="value">5</span></p>
+      <p class="stat">Experience: <span class="value">28/50</span></p>
+      <div class="stat bonuses">
+        <h3>Bonuses</h3>
+        <ul>
+          <li v-for="(bonus, i) in bonuses" :key="i">
             <strong>{{ bonus.name }}</strong>: {{ bonus.description }}
           </li>
         </ul>
@@ -29,86 +20,89 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { usePlayerStore } from '@/stores/mainStore'
+import { onMounted } from 'vue';
+import { usePlayerStore } from '@/stores/mainStore';
 
-// Access the store
-const playerStore = usePlayerStore()
-
-// Fetch players data on mount
+const playerStore = usePlayerStore();
 onMounted(() => {
-  playerStore.fetchPlayers()
-})
+  playerStore.fetchPlayers();
+});
 
-// Example bonuses array
 const bonuses = [
-  {
-    name: "Fighter of Dawn",
-    description: "If you fight an ork, you get +5 strength",
-  },
-  {
-    name: "Defender of Innocent",
-    description: "If you defend a human, you get +10 strength",
-  },
-  {
-    name: "Night Stalker",
-    description: "During night battles, you get +3 agility",
-  },
-]
+  { name: 'Fighter of Dawn', description: 'If you fight an ork, you get +5 strength' },
+  { name: 'Defender of Innocent', description: 'If you defend a human, you get +10 strength' },
+  { name: 'Night Stalker', description: 'During night battles, you get +3 agility' },
+];
 </script>
 
 <style scoped>
-* {
-  color: white;
-}
-
-.grid-container {
+.character-card {
   display: grid;
-  /* Two equal columns */
-  grid-template-columns: 70% 30%;
-  width: 98%;
-  margin-left: 1%;
-  margin-top: 1%;
-  align-items: stretch;
-  height: 500px;
-
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  background: #1e1e2f;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  padding: 2rem;
+  margin: 2rem 2rem 2rem 2rem;
 }
 
+.avatar-section,
 .stats-section {
-  border: 1px solid lightblue;
-  display: flex;
-  flex-direction: column;
-  /* justify-content: center; */
-  align-items: center;
-  text-align: center;
-  height: 100%;
-  padding-top: 5%;
-}
-
-.avatar-section {
-  border: 1px solid lightblue;
-  text-align: left;
-  /* margin-top: 2% */
-}
-
-.avatar-image-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
+  background: #27293d;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .avatar-image {
-  max-height: 500px;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  display: block;
+  margin: 0 auto;
+}
+
+.stats-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  color: #edf2f7;
 }
 
 .stat {
-  padding: 5px;
-  font-size: 1.1rem;
+  margin-bottom: 1rem;
 }
 
 .stat.name {
+  font-size: 2rem;
   font-weight: bold;
-  font-size: 1.8rem;
+  color: #ffd369;
+  margin-bottom: 1.5rem;
+}
+
+.stat .value {
+  font-weight: bold;
+  color: #ffd369;
+}
+
+.bonuses h3 {
+  margin-bottom: 0.5rem;
+  color: #a0aec0;
+}
+
+.bonuses ul {
+  list-style: inside disc;
+  padding-left: 0;
+}
+
+.bonuses li {
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .character-card {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
