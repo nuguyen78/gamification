@@ -1,7 +1,7 @@
 <template>
     <div class="card">
         <DataTable v-model:filters="filters" :value="ownItems" paginator :rows="10" dataKey="item_id"
-            filterDisplay="row" :globalFilterFields="['slot', 'name', 'description', 'bonus']" :loading="loading">
+            filterDisplay="row" :globalFilterFields="['slot', 'name', 'description', 'stats']" :loading="loading">
             <!-- Search Bar -->
             <template #header>
                 <div class="flex justify-end">
@@ -50,13 +50,22 @@
                 </template>
             </Column>
 
-            <!-- Bonus Column -->
-            <Column field="bonus" header="Bonus" style="min-width: 12rem">
+            <!-- Stats Column -->
+            <Column field="stats" header="Stats" style="min-width: 12rem">
                 <template #body="{ data }">
-                    {{ data.bonus }}
+                    {{ data.stats }}
                 </template>
                 <template #filter="{ filterModel, filterCallback }">
-                    <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by bonus" />
+                    <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by Stats" />
+                </template>
+            </Column>
+            <!-- discount Column -->
+            <Column field="discount" header="Discount" style="min-width: 12rem">
+                <template #body="{ data }">
+                    {{ data.discount }} {{ data.discount_type }}
+                </template>
+                <template #filter="{ filterModel, filterCallback }">
+                    <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by discount" />
                 </template>
             </Column>
         </DataTable>
@@ -89,7 +98,8 @@ const filters = ref({
     slot: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
     name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
     description: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    bonus: { value: null, matchMode: FilterMatchMode.CONTAINS }
+    stats: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    discount: { value: null, matchMode: FilterMatchMode.CONTAINS }
 });
 
 /* const getSeverity = (status) => {

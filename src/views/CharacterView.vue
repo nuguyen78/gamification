@@ -1,9 +1,3 @@
-<script setup lang="ts">
-import OwnedItems from '@/components/character/OwnedItems.vue'
-import CharacterOverview from '@/components/character/CharacterOverview.vue'
-import EquipedItems from '@/components/character/EquipedItems.vue'
-</script>
-
 <template>
   <main class="character-view">
     <CharacterOverview />
@@ -22,11 +16,15 @@ import EquipedItems from '@/components/character/EquipedItems.vue'
   </main>
 </template>
 
+<script setup lang="ts">
+import OwnedItems from '@/components/character/OwnedItems.vue'
+import CharacterOverview from '@/components/character/CharacterOverview.vue'
+import EquipedItems from '@/components/character/EquipedItems.vue'
+</script>
+
 <style scoped>
 .character-view {
-  /* match your overview width */
   margin: 2rem auto;
-  /* center on the page */
   padding: 0 1rem;
 }
 
@@ -41,12 +39,10 @@ import EquipedItems from '@/components/character/EquipedItems.vue'
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  /* space between the two tables */
 }
 
 .item-card {
   background: #2d2f3a;
-  /* same dark card bg */
   padding: 1.5rem;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);

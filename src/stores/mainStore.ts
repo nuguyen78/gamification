@@ -5,21 +5,22 @@ import {
   fetchOwnItems,
   fetchEquipedItems,
   equipItem,
+  fetchPlayer as fetchPlayerFromApi,
 } from '@/api/playerService'
 
 interface Player {
   id: string
-  name: string
-  nickname: string
-  surname: string
-  phone: string
-  hra1: string
-  hra2: string
-  hra3: string
-  hra4: string
-  hra5: string
-  hra6: string
-  total_score: string
+  nick: string
+  avatar: string
+  lvl: number
+  experience: number
+  health: number | 0
+  strength: number | 0
+  agility: number | 0
+  stamina: number | 0
+  intelligence: number | 0
+  speed: number | 0
+  armor: number | 0
 }
 
 interface Item {
@@ -27,15 +28,27 @@ interface Item {
   name: string
   description: string
   slot: string
-  bonus: string
+  stats: number
+  stats_type: string
+  discount: number
+  discount_type: string | ''
 }
 
 export const usePlayerStore = defineStore('player', () => {
+  const player = ref<Player | null>(null)
   const players = ref<Player[]>([])
-
   const ownItems = ref<Item[]>([])
-
   const equipedItems = ref<Item[]>([])
+
+  // Fetch a single player by character ID
+  async function fetchPlayer(characterId: number): Promise<Player | null> {
+    try {
+      player.value = await fetchPlayerFromApi(characterId)
+    } catch (err) {
+      console.error('Failed to fetch player:', err)
+    }
+    return player.value
+  }
 
   async function fetchPlayers(pageType: string | null = null) {
     try {
@@ -100,9 +113,11 @@ export const usePlayerStore = defineStore('player', () => {
   }
 
   return {
+    player,
     players,
     ownItems,
     equipedItems,
+    fetchPlayer,
     fetchPlayers,
     fetchOwnItemsByCharacter,
     fetchEquipedItemsByCharacter,

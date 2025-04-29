@@ -15,6 +15,13 @@
           <li class="nav-item">
             <RouterLink class="nav-link active" to="/items">items</RouterLink>
           </li>
+          <li class="nav-item">
+            <RouterLink class="nav-link active" to="/register">Register</RouterLink>
+          </li>
+          <!-- Když je přihlášen, zobrazíme Logout tlačítko -->
+          <li class="nav-item" v-if="isLoggedIn">
+            <button class="btn btn-link nav-link" @click="onLogout">Logout</button>
+          </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               Dropdown
@@ -46,7 +53,21 @@
   </nav>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { logout } from '@/api/authService';
+
+const router = useRouter();
+
+// reaktivně kontrolujeme, jestli je token v localStorage
+const isLoggedIn = computed(() => !!localStorage.getItem('jwt_token'));
+
+function onLogout() {
+  logout();
+  router.push({ name: 'login' });
+}
+</script>
 
 <style scoped>
 .navbar {

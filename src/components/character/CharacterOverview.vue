@@ -1,17 +1,23 @@
 <template>
   <div class="character-card">
     <div class="avatar-section">
-      <img class="avatar-image" src="@/assets/images/warrior.webp" alt="Arthur the Warrior" />
+      <img class="avatar-image" :src="`src/assets/images/${player?.avatar}`" alt="avatar image" />
     </div>
     <div class="stats-section">
-      <h2 class="stat name">Arthur</h2>
-      <p class="stat">Level: <span class="value">5</span></p>
-      <p class="stat">Experience: <span class="value">28/50</span></p>
-      <div class="stat bonuses">
-        <h3>Bonuses</h3>
+      <h2 class="stat name">{{ player?.nick }}</h2>
+      <p class="stat">Level: <span class="value">{{ player?.lvl }}</span></p>
+      <p class="stat">Experience: <span class="value">{{ player?.experience }}</span></p>
+      <div class="stat stats">
+        <h3>Stats</h3>
         <ul>
-          <li v-for="(bonus, i) in bonuses" :key="i">
-            <strong>{{ bonus.name }}</strong>: {{ bonus.description }}
+          <li v-for="(value, stat) in totalStats" :key="stat">
+            <strong>{{ stat }}:</strong> {{ value }}
+          </li>
+        </ul>
+        <h3>active achievements</h3>
+        <ul>
+          <li v-for="(achievement, i) in achievements" :key="i">
+            <strong>{{ achievement.name }}</strong>: {{ achievement.description }}
           </li>
         </ul>
       </div>
@@ -20,19 +26,47 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { computed, onMounted } from 'vue'
 import { usePlayerStore } from '@/stores/mainStore';
 
 const playerStore = usePlayerStore();
-onMounted(() => {
-  playerStore.fetchPlayers();
+const player = computed(() => playerStore.player);
+const equippedItems = computed(() => playerStore.equipedItems)
+
+onMounted(async () => {
+  await playerStore.fetchPlayer(1);
+  await playerStore.fetchEquipedItemsByCharacter(1)
 });
 
-const bonuses = [
-  { name: 'Fighter of Dawn', description: 'If you fight an ork, you get +5 strength' },
-  { name: 'Defender of Innocent', description: 'If you defend a human, you get +10 strength' },
-  { name: 'Night Stalker', description: 'During night battles, you get +3 agility' },
+const baseStats = computed(() => ({
+  health: player.value?.health ?? 0,
+  strength: player.value?.strength ?? 0,
+  agility: player.value?.agility ?? 0,
+  stamina: player.value?.stamina ?? 0,
+  speed: player.value?.speed ?? 0,
+  armor: player.value?.armor ?? 0,
+  intelligence: player.value?.intelligence ?? 0,
+}));
+
+const achievements = [
+  { name: 'Friend of Kofola', description: '5% discount for whole order' },
+  { name: 'Beer owner', description: '1 small beer for free' },
+  { name: 'did you said lays?', description: 'on first friday of month 1 free lays' },
 ];
+
+const totalStats = computed(() => {
+  const stats = { ...baseStats.value };
+
+  equippedItems.value.forEach(item => {
+    const key = (item.stats_type || '').toLowerCase() as keyof typeof stats;
+
+    if (key in stats) {
+      stats[key] += item.stats;
+    }
+  });
+
+  return stats;
+});
 </script>
 
 <style scoped>
@@ -86,17 +120,25 @@ const bonuses = [
   color: #ffd369;
 }
 
-.bonuses h3 {
+.stats ul:first-of-type {
+  /* create two newspaper-style columns */
+  columns: 2;
+  column-gap: 1.5rem;
+  /* keep your bullet inside the column */
+  list-style-position: inside;
+}
+
+.stats h3 {
   margin-bottom: 0.5rem;
   color: #a0aec0;
 }
 
-.bonuses ul {
+.stats ul {
   list-style: inside disc;
   padding-left: 0;
 }
 
-.bonuses li {
+.stats li {
   margin-bottom: 0.5rem;
 }
 
