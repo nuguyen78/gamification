@@ -6,23 +6,32 @@
         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
+
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mb-2 mb-lg-0">
-          <li class="nav-item">
+          <!-- Protected routes: only when logged in -->
+          <li class="nav-item" v-if="isLoggedIn">
             <RouterLink class="nav-link active" to="/character">Character</RouterLink>
-            <!--  <a class="nav-link active" aria-current="page" href="#">Home</a> -->
           </li>
-          <li class="nav-item">
-            <RouterLink class="nav-link active" to="/items">items</RouterLink>
+          <li class="nav-item" v-if="isLoggedIn">
+            <RouterLink class="nav-link active" to="/items">Items</RouterLink>
           </li>
-          <li class="nav-item">
+
+          <!-- Public routes: only when NOT logged in -->
+          <li class="nav-item" v-if="!isLoggedIn">
+            <RouterLink class="nav-link active" to="/login">Login</RouterLink>
+          </li>
+          <li class="nav-item" v-if="!isLoggedIn">
             <RouterLink class="nav-link active" to="/register">Register</RouterLink>
           </li>
-          <!-- Když je přihlášen, zobrazíme Logout tlačítko -->
+
+          <!-- Logout: only when logged in -->
           <li class="nav-item" v-if="isLoggedIn">
             <button class="btn btn-link nav-link" @click="onLogout">Logout</button>
           </li>
-          <li class="nav-item dropdown">
+
+          <!-- (Optional) other always-visible items -->
+          <!-- <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               Dropdown
             </a>
@@ -37,21 +46,13 @@
           </li>
           <li class="nav-item">
             <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-          </li>
+          </li> -->
         </ul>
-        <!-- <form class="d-flex" role="search">
-          <input
-            class="form-control me-2"
-            type="search"
-            placeholder="Search"
-            aria-label="Search"
-          />
-          <button class="btn btn-outline-success" type="submit">Search</button>
-        </form> -->
       </div>
     </div>
   </nav>
 </template>
+
 
 <script setup lang="ts">
 import { computed } from 'vue';
