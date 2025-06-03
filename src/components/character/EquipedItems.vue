@@ -38,15 +38,15 @@ const equippedItems = computed(() => {
 })
 
 onMounted(async () => {
-  await playerStore.fetchOwnItemsByCharacter(1)
-  await playerStore.fetchEquipedItemsByCharacter(1)
+  await playerStore.fetchOwnItemsByCharacter()
+  await playerStore.fetchEquipedItemsByCharacter()
 })
 
 // fill in these paths (or imports) with your actual icon URLs later
 const slotIconMap: Record<string, string> = {
   helmet: 'src/assets/images/helmet2.png',
   shoulders: 'src/assets/images/shoulders.png',
-  cloak: 'src/assets/images/',
+  cloak: 'src/assets/images/cloak.png',
   chest: 'src/assets/images/chest.png',
   gloves: 'src/assets/images/gloves.png',
   legs: 'src/assets/images/legs.png',

@@ -1,64 +1,72 @@
 <template>
-    <div class="register-page">
-        <h1>Registrace</h1>
-        <form @submit.prevent="onSubmit">
-            <div>
-                <label for="email">Email:</label>
-                <input v-model="email" id="email" type="email" required />
-            </div>
-            <div>
-                <label for="password">Heslo:</label>
-                <input v-model="password" id="password" type="password" required minlength="6" />
-            </div>
-            <button type="submit">Registrovat se</button>
-        </form>
-        <p>
-            Už máš účet?
-            <router-link to="/login">Přihlášení</router-link>
+    <div class="login-page">
+        <RegisterForm :error="error" :success="message" @submit="onSubmit" />
+        <p class="login-text">
+            Already have an account?
+            <router-link to="/login">Sign In</router-link>
         </p>
-        <p v-if="message" class="success">{{ message }}</p>
-        <p v-if="error" class="error">{{ error }}</p>
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { register } from '@/api/authService';
 import { useRouter } from 'vue-router';
+import { register } from '@/api/authService';
+import RegisterForm from '@/components/auth/RegisterForm.vue';
 
 export default defineComponent({
+    name: 'RegisterView',
+    components: { RegisterForm },
     setup() {
-        const email = ref('');
-        const password = ref('');
         const error = ref<string | null>(null);
         const message = ref<string | null>(null);
         const router = useRouter();
 
-        const onSubmit = () => {
+        const onSubmit = async (payload: {
+            email: string;
+            password: string;
+            name: string;
+            surname: string;
+            nick: string;
+        }) => {
             error.value = null;
             message.value = null;
-            register({ email: email.value, password: password.value })
-                .then(() => {
-                    message.value = 'Registrace proběhla úspěšně. Nyní se můžeš přihlásit.';
-                    // přesměruj třeba za 2 vteřiny
-                    setTimeout(() => router.push({ name: 'login' }), 2000);
-                })
-                .catch(() => {
-                    error.value = 'Chyba při registraci (email už může být obsazen).';
-                });
+            try {
+                await register(payload);
+                message.value = 'Registration successful! You can now sign in.';
+                setTimeout(() => router.push({ name: 'login' }), 2000);
+            } catch {
+                error.value = 'Registration failed (email may already be in use).';
+            }
         };
 
-        return { email, password, onSubmit, error, message };
+        return { error, message, onSubmit };
     }
 });
 </script>
 
 <style scoped>
-.error {
-    color: red;
+.login-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: #121214;
+    padding: 1rem;
 }
 
-.success {
-    color: green;
+.login-text {
+    margin-top: 1rem;
+    color: #a0aec0;
+}
+
+.login-text a {
+    color: #4db6ac;
+    text-decoration: none;
+}
+
+.login-text a:hover {
+    text-decoration: underline;
 }
 </style>

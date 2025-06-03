@@ -3,7 +3,7 @@ import axios from 'axios'
 import router from '@/router'
 
 const api = axios.create({
-  baseURL: 'https://l2pevents.cz/gamification', // uprav na svou doménu
+  baseURL: 'https://l2pevents.cz/gamification',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -14,10 +14,8 @@ api.interceptors.response.use(
   response => response,
   error => {
     if (error.response?.status === 401) {
-      // vymažeme token
       localStorage.removeItem('jwt_token')
       delete api.defaults.headers.common['Authorization']
-      // a přesměrujeme na přihlášení
       router.push({ name: 'login' })
     }
     return Promise.reject(error)
@@ -32,7 +30,9 @@ export interface LoginData {
 export interface RegisterData {
   email: string
   password: string
-  // případně další pole, např. username
+  name: string
+  surname: string
+  nick: string
 }
 
 export function login(data: LoginData): Promise<string> {
@@ -45,13 +45,7 @@ export function login(data: LoginData): Promise<string> {
 }
 
 export function register(data: RegisterData): Promise<void> {
-  console.log(data)
   return api.post<{ success: boolean }>('/register.php', data).then(() => {})
-}
-
-// volitelně helper pro načtení profilu
-export function fetchProfile<T>(): Promise<T> {
-  return api.get<T>('/protected.php').then(res => res.data)
 }
 
 // při startu aplikace pokusíme se nastavit token z localStorage
@@ -62,9 +56,7 @@ if (existingToken) {
 
 // Odhlášení
 export function logout(): void {
-  // Vymaž token v localStorage
   localStorage.removeItem('jwt_token')
-  // Odstraň default Authorization header
   delete api.defaults.headers.common['Authorization']
 }
 

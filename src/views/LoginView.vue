@@ -1,55 +1,63 @@
 <template>
     <div class="login-page">
-        <h1>Přihlášení</h1>
-        <form @submit.prevent="onSubmit">
-            <div>
-                <label for="email">Email:</label>
-                <input v-model="email" id="email" type="email" required />
-            </div>
-            <div>
-                <label for="password">Heslo:</label>
-                <input v-model="password" id="password" type="password" required />
-            </div>
-            <button type="submit">Přihlásit se</button>
-        </form>
-        <p>
+        <LoginForm :error="error" @submit="onSubmit" />
+        <p class="register-text">
             Ještě nemáš účet?
             <router-link to="/register">Registrace</router-link>
         </p>
-        <p v-if="error" class="error">{{ error }}</p>
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { login } from '@/api/authService';
 import { useRouter } from 'vue-router';
+import { login } from '@/api/authService';
+import LoginForm from '@/components/auth/LoginForm.vue';
 
 export default defineComponent({
+    name: 'LoginView',
+    components: { LoginForm },
     setup() {
-        const email = ref('');
-        const password = ref('');
         const error = ref<string | null>(null);
         const router = useRouter();
 
-        const onSubmit = () => {
+        const onSubmit = async ({ email, password }: { email: string; password: string }) => {
             error.value = null;
-            login({ email: email.value, password: password.value })
-                .then(() => {
-                    router.push({ name: 'home' });
-                })
-                .catch(() => {
-                    error.value = 'Neplatné přihlašovací údaje';
-                });
+            try {
+                await login({ email, password });
+                router.push({ name: 'home' });
+            } catch {
+                error.value = 'Neplatné přihlašovací údaje';
+            }
         };
 
-        return { email, password, onSubmit, error };
+        return { error, onSubmit };
     }
 });
 </script>
 
 <style scoped>
-.error {
-    color: red;
+.login-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: #121214;
+    padding: 1rem;
+}
+
+.register-text {
+    margin-top: 1rem;
+    color: #a0aec0;
+}
+
+.register-text a {
+    color: #4db6ac;
+    text-decoration: none;
+}
+
+.register-text a:hover {
+    text-decoration: underline;
 }
 </style>

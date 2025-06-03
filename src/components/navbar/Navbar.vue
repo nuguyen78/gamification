@@ -11,10 +11,16 @@
         <ul class="navbar-nav mb-2 mb-lg-0">
           <!-- Protected routes: only when logged in -->
           <li class="nav-item" v-if="isLoggedIn">
+            <RouterLink class="nav-link active" to="/DiscountCode">Discount Code</RouterLink>
+          </li>
+          <li class="nav-item" v-if="isLoggedIn">
             <RouterLink class="nav-link active" to="/character">Character</RouterLink>
           </li>
           <li class="nav-item" v-if="isLoggedIn">
             <RouterLink class="nav-link active" to="/items">Items</RouterLink>
+          </li>
+          <li class="nav-item" v-if="isLoggedIn">
+            <RouterLink class="nav-link active" to="/achievements">Achievements</RouterLink>
           </li>
 
           <!-- Public routes: only when NOT logged in -->

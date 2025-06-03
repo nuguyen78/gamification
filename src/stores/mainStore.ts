@@ -6,6 +6,10 @@ import {
   fetchEquipedItems,
   equipItem,
   fetchPlayer as fetchPlayerFromApi,
+  fetchNotOwnedAchievements as fetchNotOwnedAchievementsFromApi,
+  fetchOwnedAchievements as fetchOwnedAchievementsFromApi,
+  updateAchievementStatus as updateAchievementStatusFromApi,
+  fetchInUseAchievements as fetchInUseAchievementsFromApi,
 } from '@/api/playerService'
 
 interface Player {
@@ -34,16 +38,29 @@ interface Item {
   discount_type: string | ''
 }
 
+interface Achievement {
+  id: number
+  name: string
+  description: string
+  discount: number
+  discount_type: string
+  remaining: number
+  status: string
+}
+
 export const usePlayerStore = defineStore('player', () => {
   const player = ref<Player | null>(null)
   const players = ref<Player[]>([])
   const ownItems = ref<Item[]>([])
   const equipedItems = ref<Item[]>([])
+  const notOwnedAchievements = ref<Achievement[]>([])
+  const ownedAchievements = ref<Achievement[]>([])
+  const inUseAchievements = ref<Achievement[]>([])
 
   // Fetch a single player by character ID
-  async function fetchPlayer(characterId: number): Promise<Player | null> {
+  async function fetchPlayer(): Promise<Player | null> {
     try {
-      player.value = await fetchPlayerFromApi(characterId)
+      player.value = await fetchPlayerFromApi()
     } catch (err) {
       console.error('Failed to fetch player:', err)
     }
@@ -60,9 +77,9 @@ export const usePlayerStore = defineStore('player', () => {
   }
 
   // Fetch items based on character ID
-  async function fetchOwnItemsByCharacter(characterId: number) {
+  async function fetchOwnItemsByCharacter() {
     try {
-      ownItems.value = await fetchOwnItems(characterId)
+      ownItems.value = await fetchOwnItems()
     } catch (err) {
       console.error(err)
     }
@@ -70,18 +87,14 @@ export const usePlayerStore = defineStore('player', () => {
   }
 
   // Fetch items based on character ID
-  async function fetchEquipedItemsByCharacter(characterId: number) {
+  async function fetchEquipedItemsByCharacter() {
     try {
-      equipedItems.value = await fetchEquipedItems(characterId)
+      equipedItems.value = await fetchEquipedItems()
     } catch (err) {
       console.error(err)
     }
     return equipedItems.value
   }
-
-  /*   watchEffect(() => {
-    fetchPlayers()
-  }) */
 
   async function equipOwnedItem(characterId: number, itemId: string) {
     try {
@@ -112,15 +125,62 @@ export const usePlayerStore = defineStore('player', () => {
     }
   }
 
+  async function fetchNotOwnedAchievements(characterId: number) {
+    try {
+      notOwnedAchievements.value =
+        await fetchNotOwnedAchievementsFromApi(characterId)
+    } catch (err) {
+      console.error(err)
+    }
+    return notOwnedAchievements.value
+  }
+
+  async function fetchOwnedAchievements() {
+    try {
+      ownedAchievements.value = await fetchOwnedAchievementsFromApi()
+    } catch (err) {
+      console.error(err)
+    }
+    return ownedAchievements.value
+  }
+
+  async function updateAchievementStatus(
+    achievementId: number,
+    achievementStatus: string,
+  ) {
+    try {
+      await updateAchievementStatusFromApi(achievementId, achievementStatus)
+    } catch (err) {
+      console.error('update achievement failed:', err)
+      throw err
+    }
+  }
+
+  async function fetchInUseAchievements() {
+    try {
+      inUseAchievements.value = await fetchInUseAchievementsFromApi()
+    } catch (err) {
+      console.error(err)
+    }
+    return inUseAchievements.value
+  }
+
   return {
     player,
     players,
     ownItems,
     equipedItems,
+    notOwnedAchievements,
+    ownedAchievements,
+    inUseAchievements,
     fetchPlayer,
     fetchPlayers,
     fetchOwnItemsByCharacter,
     fetchEquipedItemsByCharacter,
     equipOwnedItem,
+    fetchNotOwnedAchievements,
+    fetchOwnedAchievements,
+    updateAchievementStatus,
+    fetchInUseAchievements,
   }
 })

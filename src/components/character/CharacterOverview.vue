@@ -16,7 +16,7 @@
         </ul>
         <h3>active achievements</h3>
         <ul>
-          <li v-for="(achievement, i) in achievements" :key="i">
+          <li v-for="(achievement, i) in inUseAchievements" :key="i">
             <strong>{{ achievement.name }}</strong>: {{ achievement.description }}
           </li>
         </ul>
@@ -29,14 +29,16 @@
 import { computed, onMounted } from 'vue'
 import { usePlayerStore } from '@/stores/mainStore';
 
+onMounted(async () => {
+  await playerStore.fetchPlayer();
+  await playerStore.fetchEquipedItemsByCharacter()
+  await playerStore.fetchInUseAchievements()
+})
+
 const playerStore = usePlayerStore();
 const player = computed(() => playerStore.player);
 const equippedItems = computed(() => playerStore.equipedItems)
-
-onMounted(async () => {
-  await playerStore.fetchPlayer(1);
-  await playerStore.fetchEquipedItemsByCharacter(1)
-});
+const inUseAchievements = computed(() => playerStore.inUseAchievements)
 
 const baseStats = computed(() => ({
   health: player.value?.health ?? 0,
@@ -90,8 +92,9 @@ const totalStats = computed(() => {
 }
 
 .avatar-image {
-  width: 100%;
+  width: 800px;
   height: auto;
+  max-height: 500px;
   border-radius: 8px;
   display: block;
   margin: 0 auto;

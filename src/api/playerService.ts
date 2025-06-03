@@ -1,9 +1,7 @@
 import api from './authService'
 
-export async function fetchPlayer(characterId: number) {
-  const response = await api.get('/player_info.php', {
-    params: { character_id: characterId },
-  })
+export async function fetchPlayer() {
+  const response = await api.get('/player_info.php')
   return response.data
 }
 
@@ -16,24 +14,48 @@ export async function fetchPlayers(pageType: string | null = null) {
   return await response.json()
 }
 
-export async function fetchOwnItems(characterId: number) {
-  const response = await api.get('/own_items.php', {
-    params: { character_id: characterId },
-  })
+export async function fetchOwnItems() {
+  const response = await api.get('/own_items.php')
   return response.data
 }
 
-export async function fetchEquipedItems(characterId: number) {
-  const response = await api.get('/equiped_items.php', {
-    params: { character_id: characterId },
-  })
+export async function fetchEquipedItems() {
+  const response = await api.get('/equiped_items.php')
   return response.data
 }
 
 export async function equipItem(characterId: number, itemId: string) {
-  const res = await api.post(`/equip_item.php`, {
+  const response = await api.post(`/equip_item.php`, {
     character_id: characterId,
     item_id: itemId,
   })
-  return res.data
+  return response.data
+}
+
+export async function fetchNotOwnedAchievements(characterId: number) {
+  const response = await api.get(`/not_owned_achievements.php`, {
+    params: { character_id: characterId },
+  })
+  return response.data
+}
+
+export async function fetchOwnedAchievements() {
+  const response = await api.get(`/own_achievements.php`)
+  return response.data
+}
+
+export async function updateAchievementStatus(
+  achievementId: number,
+  achievementStatus: string,
+) {
+  const response = await api.post(`/update_achievement_status.php`, {
+    achievementId: achievementId,
+    achievementStatus: achievementStatus,
+  })
+  return response.data
+}
+
+export async function fetchInUseAchievements() {
+  const response = await api.get('/in_use_achievements.php')
+  return response.data
 }
