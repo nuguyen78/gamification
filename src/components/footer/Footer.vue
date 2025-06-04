@@ -1,26 +1,89 @@
 <template>
-  <div class="footer">
-    <b-card class="text-center">
-      <div class="text-light">
-        This is some content within the default
-        <samp>&lt;b-card-body&gt;</samp> block of the
-        <samp>&lt;b-card&gt;</samp> component. Notice the padding between the
-        card's border and this gray <samp>&lt;div&gt;</samp>.
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <p class="footer-title">L2P Bar</p>
+        <p>Level up, drink up, and get discounts while you play!</p>
       </div>
-    </b-card>
-  </div>
+      <div class="footer-section">
+        <p class="footer-title">Links</p>
+        <ul>
+          <li>
+            <RouterLink to="/character">Character</RouterLink>
+          </li>
+          <li>
+            <RouterLink to="/items">Items</RouterLink>
+          </li>
+          <li>
+            <RouterLink to="/achievements">Achievements</RouterLink>
+          </li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <p class="footer-title">Contact</p>
+        <p>Email: <a href="mailto:info@l2pevents.cz">info@l2pevents.cz</a></p>
+        <p>Made with ❤️ in Brno</p>
+      </div>
+    </div>
+  </footer>
 </template>
-
-<script setup lang="ts"></script>
 
 <style scoped>
 .footer {
-  position: absolute;
-  left: 0;
-  bottom: 0;
+
+  color: #ccc;
+  padding: 0.5rem 0.5rem;
+  height: 14vh;
+  font-size: 0.95rem;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
   width: 100%;
-  height: 5%;
-  background-color: #6C757DFF;
-  margin-top: 5%;
+}
+
+.footer-section {
+  flex: 1 1 200px;
+  min-width: 150px;
+  /* added to avoid too narrow sections */
+}
+
+.footer-title {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #ffd369;
+}
+
+a {
+  color: #ffd369;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Mobile-friendly adjustments */
+@media (max-width: 768px) {
+  .footer-content {
+    flex-direction: column;
+    align-items: stretch;
+    /* changed to stretch for equal width */
+    gap: 0.5rem;
+    /* slightly tighter gap */
+  }
+
+  .footer-section {
+    width: 100%;
+    flex: 1 1 100px;
+  }
+
+  .footer {
+    font-size: 1rem;
+    text-align: left;
+  }
 }
 </style>

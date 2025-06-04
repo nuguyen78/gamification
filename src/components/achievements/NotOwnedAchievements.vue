@@ -41,27 +41,21 @@
                         placeholder="Search by description" />
                 </template>
             </Column>
-
-            <!-- Discount Column -->
-            <!--  <Column field="discount" header="Discount" style="min-width: 20rem">
+            <!-- Max Uses Column -->
+            <Column field="amount" header="Usage Limit" style="min-width: 8rem">
                 <template #body="{ data }">
-                    {{ data.discount }} %
+                    <span>{{ data.amount }}</span>
                 </template>
-                <template #filter="{ filterModel, filterCallback }">
-                    <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by discount" />
-                </template>
-            </Column> -->
-
-            <!-- Discount type Column -->
-            <!-- <Column field="discount_type" header="Discount type" style="min-width: 12rem">
+            </Column>
+            <!-- Condition Column -->
+            <Column header="Condition" style="min-width: 14rem">
                 <template #body="{ data }">
-                    {{ data.discount_type }}
+                    <span>{{ formatCondition(data.condition_type, data.condition_amount) }}</span>
                 </template>
-                <template #filter="{ filterModel, filterCallback }">
-                    <InputText v-model="filterModel.value" @input="filterCallback()"
-                        placeholder="Search by discount type" />
-                </template>
-            </Column> -->
+            </Column>
+
+
+
         </DataTable>
     </div>
 </template>
@@ -89,9 +83,21 @@ const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
     description: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-    /* discount: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-    discount_type: { value: null, matchMode: FilterMatchMode.STARTS_WITH } */
+    condition_type: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    condition_amount: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
 });
+
+const formatCondition = (type: string, amount: number) => {
+    if (!type) return '';
+
+    let label = type.replace(/_/g, ' ');
+
+    if (label === 'all') label = 'of any';
+    if (label === 'special') return 'Special';
+
+    if (amount === 1) return `1 ${label}`;
+    return `${amount} ${label}`;
+};
 </script>
 
 <style scoped>

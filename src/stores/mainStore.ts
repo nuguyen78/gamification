@@ -56,6 +56,7 @@ export const usePlayerStore = defineStore('player', () => {
   const notOwnedAchievements = ref<Achievement[]>([])
   const ownedAchievements = ref<Achievement[]>([])
   const inUseAchievements = ref<Achievement[]>([])
+  const userID = ref<number | null>(null)
 
   // Fetch a single player by character ID
   async function fetchPlayer(): Promise<Player | null> {

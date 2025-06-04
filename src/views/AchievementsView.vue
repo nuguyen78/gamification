@@ -5,7 +5,7 @@ import Footer from '../components/footer/Footer.vue'
 </script>
 
 <template>
-    <main>
+    <main class="achievement-view">
         <div class="items-wrapper">
             <section class="item-card">
                 <OwnAchievements />
@@ -21,12 +21,16 @@ import Footer from '../components/footer/Footer.vue'
 
 
 <style scoped>
+.achievement-view {
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
 .items-wrapper {
     display: flex;
     flex-direction: column;
     gap: 2rem;
 }
-
 
 .item-card {
     background: #2d2f3a;

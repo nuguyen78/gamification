@@ -5,8 +5,11 @@
     </div>
     <div class="stats-section">
       <h2 class="stat name">{{ player?.nick }}</h2>
-      <p class="stat">Level: <span class="value">{{ player?.lvl }}</span></p>
-      <p class="stat">Experience: <span class="value">{{ player?.experience }}</span></p>
+      <div class="stat-row">
+        <p class="stat">Level: <span class="value">{{ player?.lvl }}</span></p>
+        <p class="stat">Experience: <span class="value">{{ player?.experience }}</span></p>
+      </div>
+
       <div class="stat stats">
         <h3>Stats</h3>
         <ul>
@@ -92,7 +95,7 @@ const totalStats = computed(() => {
 }
 
 .avatar-image {
-  width: 800px;
+  width: 100%;
   height: auto;
   max-height: 500px;
   border-radius: 8px;
@@ -124,10 +127,8 @@ const totalStats = computed(() => {
 }
 
 .stats ul:first-of-type {
-  /* create two newspaper-style columns */
   columns: 2;
   column-gap: 1.5rem;
-  /* keep your bullet inside the column */
   list-style-position: inside;
 }
 
@@ -147,7 +148,50 @@ const totalStats = computed(() => {
 
 @media (max-width: 768px) {
   .character-card {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 0rem;
+    padding: 0.5rem;
+  }
+
+  .avatar-section,
+  .stats-section {
+    width: 100%;
+    padding: 1rem;
+  }
+
+  .avatar-image {
+    max-height: 300px;
+  }
+
+  .stats ul:first-of-type {
+    columns: 1;
+    /* Single column on phones */
+  }
+
+  .stat.name {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+}
+
+.stat-row {
+  display: flex;
+  flex-direction: column;
+}
+
+/* On mobile: row layout */
+@media (max-width: 768px) {
+  .stat-row {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .stat-row .stat {
+    margin-bottom: 0;
+    white-space: nowrap;
   }
 }
 </style>

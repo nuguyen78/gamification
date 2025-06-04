@@ -1,75 +1,72 @@
 <template>
-    <div class="card">
-        <DataTable v-model:filters="filters" :value="ownItems" paginator :rows="10" dataKey="item_id"
-            filterDisplay="row" :globalFilterFields="['slot', 'name', 'description', 'stats']" :loading="loading">
-            <!-- Search Bar -->
-            <template #header>
-                <div class="flex justify-end">
-                    <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
-                </div>
+    <DataTable v-model:filters="filters" :value="ownItems" paginator :rows="10" dataKey="item_id" filterDisplay="row"
+        :globalFilterFields="['slot', 'name', 'description', 'stats']" :loading="loading">
+        <!-- Search Bar -->
+        <template #header>
+            <div class="flex justify-end">
+                <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
+            </div>
+        </template>
+
+        <!-- Empty State -->
+        <template #empty>
+            No equipped items found.
+        </template>
+
+        <!-- Loading State -->
+        <template #loading>
+            Loading equipped items data. Please wait.
+        </template>
+
+        <!-- Slot Column -->
+        <Column field="slot" header="Slot" style="min-width: 12rem">
+            <template #body="{ data }">
+                {{ data.slot }}
             </template>
-
-            <!-- Empty State -->
-            <template #empty>
-                No equipped items found.
+            <template #filter="{ filterModel, filterCallback }">
+                <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by slot" />
             </template>
+        </Column>
 
-            <!-- Loading State -->
-            <template #loading>
-                Loading equipped items data. Please wait.
+        <!-- Name Column -->
+        <Column field="name" header="Name" style="min-width: 12rem">
+            <template #body="{ data }">
+                {{ data.name }}
             </template>
+            <template #filter="{ filterModel, filterCallback }">
+                <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by name" />
+            </template>
+        </Column>
 
-            <!-- Slot Column -->
-            <Column field="slot" header="Slot" style="min-width: 12rem">
-                <template #body="{ data }">
-                    {{ data.slot }}
-                </template>
-                <template #filter="{ filterModel, filterCallback }">
-                    <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by slot" />
-                </template>
-            </Column>
+        <!-- Description Column -->
+        <Column field="description" header="Description" style="min-width: 20rem">
+            <template #body="{ data }">
+                {{ data.description }}
+            </template>
+            <template #filter="{ filterModel, filterCallback }">
+                <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by description" />
+            </template>
+        </Column>
 
-            <!-- Name Column -->
-            <Column field="name" header="Name" style="min-width: 12rem">
-                <template #body="{ data }">
-                    {{ data.name }}
-                </template>
-                <template #filter="{ filterModel, filterCallback }">
-                    <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by name" />
-                </template>
-            </Column>
-
-            <!-- Description Column -->
-            <Column field="description" header="Description" style="min-width: 20rem">
-                <template #body="{ data }">
-                    {{ data.description }}
-                </template>
-                <template #filter="{ filterModel, filterCallback }">
-                    <InputText v-model="filterModel.value" @input="filterCallback()"
-                        placeholder="Search by description" />
-                </template>
-            </Column>
-
-            <!-- Stats Column -->
-            <Column field="stats" header="Stats" style="min-width: 12rem">
-                <template #body="{ data }">
-                    {{ data.stats }}
-                </template>
-                <template #filter="{ filterModel, filterCallback }">
-                    <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by Stats" />
-                </template>
-            </Column>
-            <!-- discount Column -->
-            <Column field="discount" header="Discount" style="min-width: 12rem">
-                <template #body="{ data }">
-                    {{ data.discount }} {{ data.discount_type }}
-                </template>
-                <template #filter="{ filterModel, filterCallback }">
-                    <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by discount" />
-                </template>
-            </Column>
-        </DataTable>
-    </div>
+        <!-- Stats Column -->
+        <Column field="stats" header="Stats" style="min-width: 12rem">
+            <template #body="{ data }">
+                {{ data.stats }}
+            </template>
+            <template #filter="{ filterModel, filterCallback }">
+                <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by Stats" />
+            </template>
+        </Column>
+        <!-- discount Column -->
+        <Column field="discount" header="Discount" style="min-width: 12rem">
+            <template #body="{ data }">
+                {{ data.discount }} {{ data.discount_type }}
+            </template>
+            <template #filter="{ filterModel, filterCallback }">
+                <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by discount" />
+            </template>
+        </Column>
+    </DataTable>
 </template>
 
 <script setup lang="ts">
@@ -83,8 +80,8 @@ import InputText from 'primevue/inputtext';
 const playerStore = usePlayerStore();
 
 onMounted(async () => {
-    await playerStore.fetchOwnItemsByCharacter(1)
-    await playerStore.fetchEquipedItemsByCharacter(1)
+    await playerStore.fetchOwnItemsByCharacter()
+    await playerStore.fetchEquipedItemsByCharacter()
 })
 
 const equipedItems = computed(() => playerStore.equipedItems)
@@ -102,30 +99,6 @@ const filters = ref({
     discount: { value: null, matchMode: FilterMatchMode.CONTAINS }
 });
 
-/* const getSeverity = (status) => {
-    switch (status) {
-        case 'unqualified':
-            return 'danger';
-
-        case 'qualified':
-            return 'success';
-
-        case 'new':
-            return 'info';
-
-        case 'negotiation':
-            return 'warn';
-
-        case 'renewal':
-            return null;
-    }
-} */
 </script>
 
-<style scoped>
-.grid-container {
-    padding: 2rem;
-    margin-top: 0rem;
-    color: white;
-}
-</style>
+<style scoped></style>

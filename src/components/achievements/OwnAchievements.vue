@@ -48,14 +48,26 @@
                 </template>
             </Column>
 
+            <!-- Remaining Column -->
+            <Column field="remaining" header="Remaining" style="min-width: 8rem">
+                <template #body="{ data }">
+                    <span>{{ data.remaining }}</span>
+                </template>
+            </Column>
+
             <!-- Status Column -->
             <Column field="status" header="Status" style="min-width: 10rem">
                 <template #body="{ data }">
                     <div class="status-toggle">
                         <Button @click="toggleStatus(data)" :label="getStatusLabel(data.status)"
                             :severity="getStatusSeverity(data.status)" size="small"
-                            :disabled="data.status === 'used'" />
+                            :disabled="data.status === 'used' || (data.status === 'use' && inUseCount >= 3)" />
+
                     </div>
+                </template>
+                <template #filter="{ filterModel, filterCallback }">
+                    <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="statusOptions"
+                        optionLabel="label" optionValue="value" placeholder="Filter by status" class="w-full" />
                 </template>
             </Column>
         </DataTable>
@@ -70,6 +82,7 @@ import Column from 'primevue/column';
 import { FilterMatchMode } from '@primevue/core/api';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
+import Dropdown from 'primevue/dropdown'
 
 const playerStore = usePlayerStore();
 
@@ -91,16 +104,27 @@ const filters = ref({
     status: { value: null, matchMode: FilterMatchMode.EQUALS }
 });
 
+const statusOptions = [
+    { label: 'Use', value: 'use' },
+    { label: 'In Use', value: 'in_use' },
+    { label: 'Used', value: 'used' }
+];
+
 const toggleStatus = (achievement: any) => {
-    console.log('Toggling status for achievement:', achievement.status);
+    // If user tries to activate more than 3 achievements
+    if (achievement.status === 'use' && inUseCount.value >= 3) {
+        return; // Do nothing
+    }
+
     if (achievement.status === 'use') {
         achievement.status = 'in_use';
     } else if (achievement.status === 'in_use') {
         achievement.status = 'use';
     }
-    // If you have an API to update this status, call it here
+
     playerStore.updateAchievementStatus(achievement.id, achievement.status);
 };
+
 
 // Button label helper
 const getStatusLabel = (status: string) => {
@@ -108,9 +132,11 @@ const getStatusLabel = (status: string) => {
 };
 
 const getStatusSeverity = (status: string) => {
-    // PrimeVue severity options: 'secondary', 'success', 'info', 'warning', 'danger'
-    return status === 'use' ? 'success' : 'info';
+    if (status === 'used') return 'secondary';
+    if (status === 'in_use') return 'info';
+    return 'success'; // default for 'use'
 };
+
 
 const inUseCount = computed(() => {
     return ownedAchievements.value.filter(a => a.status === 'in_use').length;

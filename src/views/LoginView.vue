@@ -2,8 +2,8 @@
     <div class="login-page">
         <LoginForm :error="error" @submit="onSubmit" />
         <p class="register-text">
-            Ještě nemáš účet?
-            <router-link to="/register">Registrace</router-link>
+            Don't have an account yet?
+            <router-link to="/register">Register</router-link>
         </p>
     </div>
 </template>
@@ -25,9 +25,10 @@ export default defineComponent({
             error.value = null;
             try {
                 await login({ email, password });
-                router.push({ name: 'home' });
+                window.dispatchEvent(new Event('storage-change'))
+                router.push({ name: 'character' });
             } catch {
-                error.value = 'Neplatné přihlašovací údaje';
+                error.value = 'Invalid login credentials';
             }
         };
 

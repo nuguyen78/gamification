@@ -1,25 +1,25 @@
 <template>
-    <h1 class="header-text">Owned Items</h1>
-    <div class="card">
-        <DataTable v-model:filters="filters" :value="ownItems" paginator :rows="10" dataKey="item_id"
+    <div class="grid-container">
+        <h1 class="header-text">Owned Items</h1>
+
+        <!-- Desktop Table with full filters -->
+        <DataTable v-if="!isMobile" v-model:filters="filters" :value="ownItems" paginator :rows="10" dataKey="item_id"
             filterDisplay="row" :globalFilterFields="['slot', 'name', 'description', 'stats', 'discount']"
-            :loading="loading">
-            <!-- Search Bar -->
+            :loading="loading" responsiveLayout="scroll">
+            <!-- Global Search -->
             <template #header>
                 <div class="flex justify-end">
                     <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
                 </div>
             </template>
 
-            <!-- Empty State -->
-            <template #empty>
-                No equipped items found.
-            </template>
-
-            <!-- Loading State -->
-            <template #loading>
-                Loading equipped items data. Please wait.
-            </template>
+            <!-- Icon Column -->
+            <Column header="Icon" style="width:3rem;text-align:center;" class="icon-column">
+                <template #body="{ data }">
+                    <img :src="slotIconMap[data.slot] || '/src/assets/images/warrior.webp'" :alt="data.slot"
+                        class="item-icon" />
+                </template>
+            </Column>
 
             <!-- Slot Column -->
             <Column field="slot" header="Slot" style="min-width: 12rem">
@@ -68,8 +68,7 @@
                     {{ data.discount }}
                 </template>
                 <template #filter="{ filterModel, filterCallback }">
-                    <InputText v-model="filterModel.value" @input="filterCallback()"
-                        placeholder="Search by discounts" />
+                    <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by discount" />
                 </template>
             </Column>
 
@@ -80,31 +79,63 @@
                 </template>
             </Column>
         </DataTable>
+
+        <!-- Mobile Table with only global search -->
+        <DataTable v-else :value="ownItems" tableStyle="min-width:30rem" class="mobile-table"
+            @row-click="showItemDetails" responsiveLayout="scroll">
+            <!-- Global Search -->
+            <template #header>
+                <div class="flex justify-end">
+                    <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
+                </div>
+            </template>
+
+            <Column header="Icon" style="width:3rem;text-align:center;" class="icon-column">
+                <template #body="{ data }">
+                    <img :src="slotIconMap[data.slot] || '/src/assets/images/warrior.webp'" :alt="data.slot"
+                        class="item-icon" />
+                </template>
+            </Column>
+
+            <Column field="discount" header="Discount"></Column>
+        </DataTable>
+
+        <!-- Modal for Mobile Details -->
+        <Dialog v-model:visible="visible" modal header="Item Details" :style="{ width: '80vw' }"
+            :dismissableMask="true">
+            <div v-if="selectedItem">
+                <p><strong>Slot:</strong> {{ selectedItem.slot }}</p>
+                <p><strong>Name:</strong> {{ selectedItem.name }}</p>
+                <p><strong>Description:</strong> {{ selectedItem.description }}</p>
+                <p><strong>Stats:</strong> {{ selectedItem.stats }}</p>
+                <p><strong>Discount:</strong> {{ selectedItem.discount }}</p>
+                <Button label="Equip" :loading="loadingId === selectedItem.item_id"
+                    @click="onEquip(selectedItem.item_id)" />
+            </div>
+        </Dialog>
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onBeforeMount, ref } from 'vue'
 import { usePlayerStore } from '@/stores/mainStore'
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import { FilterMatchMode } from '@primevue/core/api';
-import InputText from 'primevue/inputtext';
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+import { FilterMatchMode } from '@primevue/core/api'
+import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
+import Dialog from 'primevue/dialog'
 
-const playerStore = usePlayerStore();
+const playerStore = usePlayerStore()
+const CHARACTER_ID = 1
 
-const loadingId = ref<string | null>(null) //TODO
-const CHARACTER_ID = 1  // TODO or pull this from your auth/user store
+const isMobile = ref(false)
+const visible = ref(false)
+const selectedItem = ref<any>(null)
+const loadingId = ref<string | null>(null)
+const loading = ref(false)
 
-onMounted(async () => {
-    await playerStore.fetchOwnItemsByCharacter(1)
-    await playerStore.fetchEquipedItemsByCharacter(1)
-})
-
-const equipedItems = computed(() => playerStore.equipedItems)
 const ownItemsData = computed(() => playerStore.ownItems)
-
 const ownItems = computed(() => {
     return ownItemsData.value.map(item => ({
         ...item,
@@ -112,9 +143,8 @@ const ownItems = computed(() => {
         discount: `${item.discount}% ${item.discount_type}`
     }))
 })
-const loading = ref(false);
 
-// Filters configuration
+// Filters: full filters for desktop
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     slot: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
@@ -122,36 +152,79 @@ const filters = ref({
     description: { value: null, matchMode: FilterMatchMode.CONTAINS },
     stats: { value: null, matchMode: FilterMatchMode.CONTAINS },
     discount: { value: null, matchMode: FilterMatchMode.CONTAINS }
-});
+})
 
+const slotIconMap: Record<string, string> = {
+    helmet: 'src/assets/images/helmet2.png',
+    shoulders: 'src/assets/images/shoulders.png',
+    cloak: 'src/assets/images/cloak.png',
+    chest: 'src/assets/images/chest.png',
+    gloves: 'src/assets/images/gloves.png',
+    legs: 'src/assets/images/legs.png',
+    feet: 'src/assets/images/feet.png',
+    ring: 'src/assets/images/ring.png',
+    weapon: 'src/assets/images/sword_icon2.webp'
+}
+
+// Determine if it's mobile
+const checkMobile = () => {
+    isMobile.value = window.innerWidth < 768
+}
+onBeforeMount(() => {
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+})
+
+// Load data
+onMounted(async () => {
+    await playerStore.fetchOwnItemsByCharacter()
+    await playerStore.fetchEquipedItemsByCharacter()
+})
+
+// Equip item
 async function onEquip(itemId: string) {
     loadingId.value = itemId
     try {
         await playerStore.equipOwnedItem(CHARACTER_ID, itemId)
-        // optionally show a toast/notification here
-    }
-    catch (e) {
+    } catch (e) {
         console.error(e)
-        // show error feedback
-    }
-    finally {
+    } finally {
         loadingId.value = null
+        visible.value = false // Close modal after equip
     }
+}
+
+// Show modal on mobile
+const showItemDetails = (event: any) => {
+    selectedItem.value = event.data
+    visible.value = true
 }
 </script>
 
 <style scoped>
 .grid-container {
     padding: 2rem;
-    margin-top: 0rem;
     color: white;
 }
 
 .header-text {
-    color: white
+    color: white;
 }
 
 .card {
     border: none;
+}
+
+.item-icon {
+    width: 4.5rem;
+    height: 4.5rem;
+    object-fit: contain;
+    display: inline-block;
+}
+
+@media (max-width: 1280px) {
+    .grid-container {
+        padding: 0;
+    }
 }
 </style>
