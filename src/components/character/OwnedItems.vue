@@ -185,7 +185,7 @@ onMounted(async () => {
 async function onEquip(itemId: string) {
     loadingId.value = itemId
     try {
-        await playerStore.equipOwnedItem(CHARACTER_ID, itemId)
+        await playerStore.equipOwnedItem(itemId)
     } catch (e) {
         console.error(e)
     } finally {

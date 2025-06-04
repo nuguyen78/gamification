@@ -10,6 +10,7 @@ import {
   fetchOwnedAchievements as fetchOwnedAchievementsFromApi,
   updateAchievementStatus as updateAchievementStatusFromApi,
   fetchInUseAchievements as fetchInUseAchievementsFromApi,
+  fetchAllItems as fetchAllItemsFromApi,
 } from '@/api/playerService'
 
 interface Player {
@@ -18,6 +19,7 @@ interface Player {
   avatar: string
   lvl: number
   experience: number
+  class: string
   health: number | 0
   strength: number | 0
   agility: number | 0
@@ -56,7 +58,7 @@ export const usePlayerStore = defineStore('player', () => {
   const notOwnedAchievements = ref<Achievement[]>([])
   const ownedAchievements = ref<Achievement[]>([])
   const inUseAchievements = ref<Achievement[]>([])
-  const userID = ref<number | null>(null)
+  const allItems = ref<Item[]>([])
 
   // Fetch a single player by character ID
   async function fetchPlayer(): Promise<Player | null> {
@@ -97,10 +99,10 @@ export const usePlayerStore = defineStore('player', () => {
     return equipedItems.value
   }
 
-  async function equipOwnedItem(characterId: number, itemId: string) {
+  async function equipOwnedItem(itemId: string) {
     try {
       // 1) send equip request
-      await equipItem(characterId, itemId)
+      await equipItem(itemId)
 
       // 2) locate the item you just equipped
       const ownIdx = ownItems.value.findIndex(i => i.item_id === itemId)
@@ -166,6 +168,15 @@ export const usePlayerStore = defineStore('player', () => {
     return inUseAchievements.value
   }
 
+  async function fetchAllItems() {
+    try {
+      allItems.value = await fetchAllItemsFromApi()
+    } catch (err) {
+      console.error(err)
+    }
+    return allItems.value
+  }
+
   return {
     player,
     players,
@@ -174,6 +185,7 @@ export const usePlayerStore = defineStore('player', () => {
     notOwnedAchievements,
     ownedAchievements,
     inUseAchievements,
+    allItems,
     fetchPlayer,
     fetchPlayers,
     fetchOwnItemsByCharacter,
@@ -183,5 +195,6 @@ export const usePlayerStore = defineStore('player', () => {
     fetchOwnedAchievements,
     updateAchievementStatus,
     fetchInUseAchievements,
+    fetchAllItems,
   }
 })

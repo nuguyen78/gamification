@@ -24,6 +24,10 @@
             <RouterLink class="nav-link active" to="/achievements">Achievements</RouterLink>
           </li>
 
+          <li class="nav-item" v-if="isLoggedIn">
+            <RouterLink class="nav-link active" to="/faq">FAQ</RouterLink>
+          </li>
+
           <!-- Public routes: only when NOT logged in -->
           <li class="nav-item" v-if="!isLoggedIn">
             <RouterLink class="nav-link active" to="/login">Login</RouterLink>
@@ -65,6 +69,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { logout } from '@/api/authService'
+import $ from 'jquery'
 
 const router = useRouter()
 const isLoggedIn = ref(!!localStorage.getItem('jwt_token'))
@@ -91,6 +96,14 @@ function onLogout() {
   window.dispatchEvent(new Event('storage-change'))
   router.push({ name: 'login' })
 }
+
+onMounted(() => {
+  $(document).ready(function () {
+    $('.dropdown-item, .single, .nav-link').on('click', function () {
+      $('#navbarSupportedContent').removeClass('show')
+    })
+  })
+})
 </script>
 
 <style scoped>

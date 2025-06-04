@@ -38,4 +38,10 @@ import Footer from '../components/footer/Footer.vue'
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
+
+@media (max-width: 1280px) {
+    .item-card {
+        padding: 0.5rem;
+    }
+}
 </style>

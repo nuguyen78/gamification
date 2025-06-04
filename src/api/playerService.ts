@@ -24,9 +24,8 @@ export async function fetchEquipedItems() {
   return response.data
 }
 
-export async function equipItem(characterId: number, itemId: string) {
+export async function equipItem(itemId: string) {
   const response = await api.post(`/equip_item.php`, {
-    character_id: characterId,
     item_id: itemId,
   })
   return response.data
@@ -57,5 +56,10 @@ export async function updateAchievementStatus(
 
 export async function fetchInUseAchievements() {
   const response = await api.get('/in_use_achievements.php')
+  return response.data
+}
+
+export async function fetchAllItems() {
+  const response = await api.get('/all_items.php')
   return response.data
 }

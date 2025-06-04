@@ -26,7 +26,7 @@ export default defineComponent({
             try {
                 await login({ email, password });
                 window.dispatchEvent(new Event('storage-change'))
-                router.push({ name: 'character' });
+                router.push({ name: 'faq' });
             } catch {
                 error.value = 'Invalid login credentials';
             }

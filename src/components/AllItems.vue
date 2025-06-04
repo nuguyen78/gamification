@@ -1,104 +1,186 @@
 <template>
-    <DataTable v-model:filters="filters" :value="ownItems" paginator :rows="10" dataKey="item_id" filterDisplay="row"
-        :globalFilterFields="['slot', 'name', 'description', 'stats']" :loading="loading">
-        <!-- Search Bar -->
-        <template #header>
-            <div class="flex justify-end">
+    <div class="grid-container">
+        <h1 class="header-text">All Items</h1>
+
+        <!-- Desktop Version -->
+        <DataTable v-if="!isMobile" v-model:filters="filters" :value="allItems" paginator :rows="50" dataKey="item_id"
+            filterDisplay="row" :globalFilterFields="['slot', 'name', 'description', 'statsDisplay', 'discountDisplay']"
+            :loading="loading" responsiveLayout="scroll">
+            <template #header>
+                <div class="flex justify-end">
+                    <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
+                </div>
+            </template>
+
+            <template #empty>No equipped items found.</template>
+            <template #loading>Loading equipped items data. Please wait.</template>
+
+            <Column header="Icon" style="width:4rem;text-align:center;">
+                <template #body="{ data }">
+                    <img :src="slotIconMap[data.slot] || '/src/assets/images/warrior.webp'" :alt="data.slot"
+                        class="item-icon" />
+                </template>
+            </Column>
+
+            <Column field="slot" header="Slot" style="min-width: 12rem">
+                <template #body="{ data }">{{ data.slot }}</template>
+                <template #filter="{ filterModel, filterCallback }">
+                    <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by slot" />
+                </template>
+            </Column>
+
+            <Column field="name" header="Name" style="min-width: 12rem">
+                <template #body="{ data }">{{ data.name }}</template>
+                <template #filter="{ filterModel, filterCallback }">
+                    <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by name" />
+                </template>
+            </Column>
+
+            <Column field="description" header="Description" style="min-width: 20rem">
+                <template #body="{ data }">{{ data.description }}</template>
+                <template #filter="{ filterModel, filterCallback }">
+                    <InputText v-model="filterModel.value" @input="filterCallback()"
+                        placeholder="Search by description" />
+                </template>
+            </Column>
+
+            <Column field="statsDisplay" header="Stats" style="min-width: 12rem">
+                <template #body="{ data }">{{ data.stats }} {{ data.stats_type }}</template>
+                <template #filter="{ filterModel, filterCallback }">
+                    <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by stats" />
+                </template>
+            </Column>
+
+            <Column field="discountDisplay" header="Discount" style="min-width: 12rem">
+                <template #body="{ data }">{{ data.discount }}% {{ data.discount_type }}</template>
+                <template #filter="{ filterModel, filterCallback }">
+                    <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by discount" />
+                </template>
+            </Column>
+        </DataTable>
+
+        <!-- Mobile Version -->
+        <div v-else>
+            <!-- Mobile Global Search -->
+            <div class="flex justify-end mb-2">
                 <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
             </div>
-        </template>
 
-        <!-- Empty State -->
-        <template #empty>
-            No equipped items found.
-        </template>
+            <DataTable :value="allItems" class="mobile-table" @row-click="showItemDetails" dataKey="item_id"
+                responsiveLayout="scroll" :filters="filters"
+                :globalFilterFields="['slot', 'name', 'description', 'statsDisplay', 'discountDisplay']">
+                <Column header="Icon" style="width:4rem;text-align:center;">
+                    <template #body="{ data }">
+                        <img :src="slotIconMap[data.slot] || '/src/assets/images/warrior.webp'" :alt="data.slot"
+                            class="item-icon" />
+                    </template>
+                </Column>
+                <Column field="name" header="Name" />
+            </DataTable>
+        </div>
 
-        <!-- Loading State -->
-        <template #loading>
-            Loading equipped items data. Please wait.
-        </template>
 
-        <!-- Slot Column -->
-        <Column field="slot" header="Slot" style="min-width: 12rem">
-            <template #body="{ data }">
-                {{ data.slot }}
-            </template>
-            <template #filter="{ filterModel, filterCallback }">
-                <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by slot" />
-            </template>
-        </Column>
-
-        <!-- Name Column -->
-        <Column field="name" header="Name" style="min-width: 12rem">
-            <template #body="{ data }">
-                {{ data.name }}
-            </template>
-            <template #filter="{ filterModel, filterCallback }">
-                <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by name" />
-            </template>
-        </Column>
-
-        <!-- Description Column -->
-        <Column field="description" header="Description" style="min-width: 20rem">
-            <template #body="{ data }">
-                {{ data.description }}
-            </template>
-            <template #filter="{ filterModel, filterCallback }">
-                <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by description" />
-            </template>
-        </Column>
-
-        <!-- Stats Column -->
-        <Column field="stats" header="Stats" style="min-width: 12rem">
-            <template #body="{ data }">
-                {{ data.stats }}
-            </template>
-            <template #filter="{ filterModel, filterCallback }">
-                <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by Stats" />
-            </template>
-        </Column>
-        <!-- discount Column -->
-        <Column field="discount" header="Discount" style="min-width: 12rem">
-            <template #body="{ data }">
-                {{ data.discount }} {{ data.discount_type }}
-            </template>
-            <template #filter="{ filterModel, filterCallback }">
-                <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by discount" />
-            </template>
-        </Column>
-    </DataTable>
+        <!-- Modal -->
+        <Dialog v-model:visible="visible" modal header="Item Details" :style="{ width: '80vw' }"
+            :dismissableMask="true">
+            <div v-if="selectedItem">
+                <p><strong>Slot:</strong> {{ selectedItem.slot }}</p>
+                <p><strong>Name:</strong> {{ selectedItem.name }}</p>
+                <p><strong>Description:</strong> {{ selectedItem.description }}</p>
+                <p><strong>Stats:</strong> {{ selectedItem.stats }} {{ selectedItem.stats_type }}</p>
+                <p><strong>Discount:</strong> {{ selectedItem.discount }}% {{ selectedItem.discount_type }}</p>
+            </div>
+        </Dialog>
+    </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { ref, computed, onMounted, onBeforeMount } from 'vue'
 import { usePlayerStore } from '@/stores/mainStore'
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import { FilterMatchMode } from '@primevue/core/api';
-import InputText from 'primevue/inputtext';
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+import InputText from 'primevue/inputtext'
+import Dialog from 'primevue/dialog'
+import { FilterMatchMode } from '@primevue/core/api'
 
-const playerStore = usePlayerStore();
+const playerStore = usePlayerStore()
+const loading = ref(false)
+const visible = ref(false)
+const selectedItem = ref<any>(null)
+const isMobile = ref(false)
 
-onMounted(async () => {
-    await playerStore.fetchOwnItemsByCharacter()
-    await playerStore.fetchEquipedItemsByCharacter()
+const checkMobile = () => {
+    isMobile.value = window.innerWidth < 768
+}
+onBeforeMount(() => {
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
 })
 
-const equipedItems = computed(() => playerStore.equipedItems)
-const ownItems = computed(() => playerStore.ownItems)
+onMounted(async () => {
+    loading.value = true
+    await playerStore.fetchAllItems()
+    loading.value = false
+})
 
-const loading = ref(false);
+const allItems = computed(() =>
+    playerStore.allItems.map(item => ({
+        ...item,
+        statsDisplay: `${item.stats} ${item.stats_type}`.toLowerCase(),
+        discountDisplay:
+            item.discount && item.discount_type
+                ? `${item.discount} ${item.discount_type}`.toLowerCase()
+                : '',
+    }))
+)
 
-// Filters configuration
+const showItemDetails = (event: any) => {
+    selectedItem.value = event.data
+    visible.value = true
+}
+
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     slot: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
     name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
     description: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    stats: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    discount: { value: null, matchMode: FilterMatchMode.CONTAINS }
-});
+    statsDisplay: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    discountDisplay: { value: null, matchMode: FilterMatchMode.CONTAINS },
+})
 
+const slotIconMap: Record<string, string> = {
+    helmet: 'src/assets/images/helmet2.png',
+    shoulders: 'src/assets/images/shoulders.png',
+    cloak: 'src/assets/images/cloak.png',
+    chest: 'src/assets/images/chest.png',
+    gloves: 'src/assets/images/gloves.png',
+    legs: 'src/assets/images/legs.png',
+    feet: 'src/assets/images/feet.png',
+    ring: 'src/assets/images/ring.png',
+    weapon: 'src/assets/images/sword_icon2.webp'
+}
 </script>
 
-<style scoped></style>
+<style scoped>
+.grid-container {
+    padding: 0 2rem 2rem;
+    color: white;
+}
+
+.item-icon {
+    width: 4.5rem;
+    height: 4.5rem;
+    object-fit: contain;
+    display: inline-block;
+}
+
+.header-text {
+    color: white;
+}
+
+@media (max-width: 1280px) {
+    .grid-container {
+        padding: 0;
+    }
+}
+</style>

@@ -5,6 +5,7 @@
     </div>
     <div class="stats-section">
       <h2 class="stat name">{{ player?.nick }}</h2>
+      <h5 class="stat">Class: <span class="value">{{ player?.class }}</span></h5>
       <div class="stat-row">
         <p class="stat">Level: <span class="value">{{ player?.lvl }}</span></p>
         <p class="stat">Experience: <span class="value">{{ player?.experience }}</span></p>

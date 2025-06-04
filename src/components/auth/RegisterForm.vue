@@ -6,22 +6,33 @@
                 <label for="email">Email</label>
                 <InputText id="email" v-model="email" class="full-width" required />
             </div>
+
             <div class="p-field">
                 <label for="password">Password</label>
                 <Password id="password" v-model="password" toggleMask class="full-width" required minlength="6" />
             </div>
+
             <div class="p-field">
                 <label for="name">First Name</label>
                 <InputText id="name" v-model="name" class="full-width bcg-color" required />
             </div>
+
             <div class="p-field">
                 <label for="surname">Last Name</label>
                 <InputText id="surname" v-model="surname" class="full-width bcg-color" required />
             </div>
+
             <div class="p-field">
                 <label for="nick">Nickname</label>
                 <InputText id="nick" v-model="nick" class="full-width bcg-color" required />
             </div>
+
+            <div class="p-field">
+                <label for="charClass">Class</label>
+                <Dropdown id="charClass" v-model="charClass" :options="classOptions" optionLabel="label"
+                    optionValue="value" placeholder="Select a class" class="full-width bcg-color" required />
+            </div>
+
             <Button type="submit" label="Sign Up" class="p-button-rounded p-button-success full-width" />
         </form>
 
@@ -35,10 +46,11 @@ import { defineComponent, ref } from 'vue';
 import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
 import Button from 'primevue/button';
+import Dropdown from 'primevue/dropdown';
 
 export default defineComponent({
     name: 'RegisterForm',
-    components: { InputText, Password, Button },
+    components: { InputText, Password, Button, Dropdown },
     props: {
         error: { type: String, default: null },
         success: { type: String, default: null }
@@ -50,6 +62,13 @@ export default defineComponent({
         const name = ref('');
         const surname = ref('');
         const nick = ref('');
+        const charClass = ref('');
+
+        const classOptions = [
+            { label: 'Warrior', value: 'warrior' },
+            { label: 'Hunter', value: 'hunter' },
+            { label: 'Mage', value: 'mage' }
+        ];
 
         const submitForm = () => {
             emit('submit', {
@@ -57,11 +76,16 @@ export default defineComponent({
                 password: password.value,
                 name: name.value,
                 surname: surname.value,
-                nick: nick.value
+                nick: nick.value,
+                class: charClass.value
             });
         };
 
-        return { name, surname, email, password, nick, submitForm };
+        return {
+            name, surname, email, password, nick,
+            charClass, classOptions,
+            submitForm
+        };
     }
 });
 </script>
