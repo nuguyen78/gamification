@@ -57,16 +57,12 @@
         </DataTable>
 
         <!-- Modal -->
-        <Dialog v-model:visible="visible" modal header="Achievement Details" :style="{ width: '80vw' }"
-            :dismissableMask="true">
-            <div v-if="selectedAchievement">
-                <p><strong>Name:</strong> {{ selectedAchievement.name }}</p>
-                <p><strong>Description:</strong> {{ selectedAchievement.description }}</p>
-                <p><strong>Usage Limit:</strong> {{ selectedAchievement.amount }}</p>
-                <p><strong>Condition:</strong> {{ formatCondition(selectedAchievement.condition_type,
-                    selectedAchievement.condition_amount) }}</p>
-            </div>
-        </Dialog>
+        <ReusableModal v-model:visible="visible" :header="'Achievement Details'" :item="selectedAchievement" :fields="{
+            Name: 'name',
+            Description: 'description',
+            'Usage Limit': 'amount',
+            Condition: (item: any) => formatCondition(item.condition_type, item.condition_amount)
+        }" />
     </div>
 </template>
 
@@ -76,8 +72,8 @@ import { usePlayerStore } from '@/stores/mainStore'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import InputText from 'primevue/inputtext'
-import Dialog from 'primevue/dialog'
 import { FilterMatchMode } from '@primevue/core/api'
+import ReusableModal from '@/components/ReusableModal.vue'
 
 const playerStore = usePlayerStore()
 

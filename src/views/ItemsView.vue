@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AllItems from '../components/AllItems.vue'
+import AllItems from '../components/AllItems/AllItems.vue'
 import Footer from '../components/footer/Footer.vue'
 </script>
 

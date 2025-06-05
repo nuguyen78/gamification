@@ -1,7 +1,10 @@
 <template>
-  <div class="character-card">
+  <div v-if="loading" class="loading-screen">
+    <i class="pi pi-spin pi-spinner" style="font-size: 15rem;color: gray;"></i>
+  </div>
+  <div v-else class="character-card">
     <div class="avatar-section">
-      <img class="avatar-image" :src="`src/assets/images/${player?.avatar}`" alt="avatar image" />
+      <img class="avatar-image" :src="`${base}images/${player?.avatar}`" alt="avatar image" />
     </div>
     <div class="stats-section">
       <h2 class="stat name">{{ player?.nick }}</h2>
@@ -30,13 +33,19 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { usePlayerStore } from '@/stores/mainStore';
+import "primeicons/primeicons.css";
+
+const base = import.meta.env.BASE_URL;
+const loading = ref(true)
 
 onMounted(async () => {
+  loading.value = true
   await playerStore.fetchPlayer();
   await playerStore.fetchEquipedItemsByCharacter()
   await playerStore.fetchInUseAchievements()
+  loading.value = false
 })
 
 const playerStore = usePlayerStore();
@@ -194,5 +203,12 @@ const totalStats = computed(() => {
     margin-bottom: 0;
     white-space: nowrap;
   }
+}
+
+.loading-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50vh;
 }
 </style>

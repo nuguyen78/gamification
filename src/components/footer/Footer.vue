@@ -8,17 +8,24 @@
       <div class="footer-section">
         <p class="footer-title">Links</p>
         <ul>
-          <li>
+          <li v-if="isLoggedIn">
             <RouterLink to="/character">Character</RouterLink>
           </li>
-          <li>
+          <li v-if="isLoggedIn">
             <RouterLink to="/items">Items</RouterLink>
           </li>
-          <li>
+          <li v-if="isLoggedIn">
             <RouterLink to="/achievements">Achievements</RouterLink>
+          </li>
+          <li v-if="!isLoggedIn">
+            <RouterLink to="/login">Login</RouterLink>
+          </li>
+          <li v-if="!isLoggedIn">
+            <RouterLink to="/register">Register</RouterLink>
           </li>
         </ul>
       </div>
+
       <div class="footer-section">
         <p class="footer-title">Contact</p>
         <p>Email: <a href="mailto:info@l2pevents.cz">info@l2pevents.cz</a></p>
@@ -27,6 +34,17 @@
     </div>
   </footer>
 </template>
+
+<script setup lang="ts">
+import { computed } from 'vue'
+import { RouterLink } from 'vue-router'
+
+import { useAuthStore } from '@/stores/authStore'
+import { storeToRefs } from 'pinia'
+
+const authStore = useAuthStore()
+const { isLoggedIn } = storeToRefs(authStore)
+</script>
 
 <style scoped>
 .footer {

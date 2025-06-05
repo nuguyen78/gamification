@@ -7,8 +7,7 @@
       responsiveLayout="scroll">
       <Column header="Icon" style="width:3rem;text-align:center;" class="icon-column">
         <template #body="slotProps">
-          <img :src="slotIconMap[slotProps.data.slot] || '/src/assets/images/warrior.webp'" :alt="slotProps.data.slot"
-            class="item-icon" />
+          <img :src="slotIconMap[slotProps.data.slot]" :alt="slotProps.data.slot" class="item-icon" />
         </template>
       </Column>
       <Column field="slot" header="Slot"></Column>
@@ -23,8 +22,7 @@
       responsiveLayout="scroll">
       <Column header="Icon" style="width:3rem;text-align:center;" class="icon-column">
         <template #body="slotProps">
-          <img :src="slotIconMap[slotProps.data.slot] || '/src/assets/images/warrior.webp'" :alt="slotProps.data.slot"
-            class="item-icon" />
+          <img :src="slotIconMap[slotProps.data.slot]" :alt="slotProps.data.slot" class="item-icon" />
         </template>
       </Column>
       <Column field="discount" header="Discount"></Column>
@@ -49,6 +47,7 @@ import Column from 'primevue/column'
 import Dialog from 'primevue/dialog'
 import { usePlayerStore } from '@/stores/mainStore'
 
+const base = import.meta.env.BASE_URL;
 // Reactive state for modal and selected item
 const visible = ref(false)
 const selectedItem = ref<any>(null)
@@ -56,12 +55,29 @@ const isMobile = ref(false)
 
 const playerStore = usePlayerStore()
 const equippedItemsData = computed(() => playerStore.equipedItems)
+
+const slotOrder = [
+  'helmet',
+  'shoulders',
+  'cloak',
+  'chest',
+  'gloves',
+  'legs',
+  'feet',
+  'ring',
+  'weapon'
+]
+
 const equippedItems = computed(() => {
-  return equippedItemsData.value.map(item => ({
+  const mapped = equippedItemsData.value.map(item => ({
     ...item,
     stats: `+${item.stats} ${item.stats_type}`,
-    discount: `${item.discount}% ${item.discount_type}`
+    discount: item.discount === 0 ? '-' : `${item.discount}% of ${item.discount_type}`
   }))
+
+  return mapped.sort((a, b) => {
+    return slotOrder.indexOf(a.slot) - slotOrder.indexOf(b.slot)
+  })
 })
 
 // Show modal on mobile
@@ -87,15 +103,15 @@ onMounted(async () => {
 
 // slotIconMap (fill in with your icons)
 const slotIconMap: Record<string, string> = {
-  helmet: 'src/assets/images/helmet2.png',
-  shoulders: 'src/assets/images/shoulders.png',
-  cloak: 'src/assets/images/cloak.png',
-  chest: 'src/assets/images/chest.png',
-  gloves: 'src/assets/images/gloves.png',
-  legs: 'src/assets/images/legs.png',
-  feet: 'src/assets/images/feet.png',
-  ring: 'src/assets/images/ring.png',
-  weapon: 'src/assets/images/sword_icon2.webp'
+  helmet: `${base}images/helmet2.png`,
+  shoulders: `${base}images/shoulders.png`,
+  cloak: `${base}images/cloak.png`,
+  chest: `${base}images/chest.png`,
+  gloves: `${base}images/gloves.png`,
+  legs: `${base}images/legs.png`,
+  feet: `${base}images/feet.png`,
+  ring: `${base}images/ring.png`,
+  weapon: `${base}images/sword_icon2.webp`
 }
 </script>
 

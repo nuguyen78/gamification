@@ -18,8 +18,8 @@ export default defineComponent({
     name: 'RegisterView',
     components: { RegisterForm },
     setup() {
-        const error = ref<string | null>(null);
-        const message = ref<string | null>(null);
+        const error = ref<string | undefined>(undefined);
+        const message = ref<string | undefined>(undefined);
         const router = useRouter();
 
         const onSubmit = async (payload: {
@@ -29,8 +29,8 @@ export default defineComponent({
             surname: string;
             nick: string;
         }) => {
-            error.value = null;
-            message.value = null;
+            error.value = undefined;
+            message.value = undefined;
             try {
                 await register(payload);
                 message.value = 'Registration successful! You can now sign in.';

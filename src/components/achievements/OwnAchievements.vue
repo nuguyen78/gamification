@@ -161,7 +161,6 @@ const inUseCount = computed(() =>
 
 .header-text {
     margin: 0;
-    color: white;
 }
 
 .status-counter {

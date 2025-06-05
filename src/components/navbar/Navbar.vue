@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar navbar-expand-lg position-fixed top-0 w-100" data-bs-theme="dark">
     <div class="container-fluid">
-      <RouterLink class="navbar-brand" to="/"><img src='/src/assets/images/l2p_logo.png' class="logo-icon" />
+      <RouterLink class="navbar-brand" to="/"><img :src="`${base}images/l2p_logo.png`" class="logo-icon" />
       </RouterLink>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,40 +66,35 @@
 
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { logout } from '@/api/authService'
+import { useAuthStore } from '@/stores/authStore'
+import { storeToRefs } from 'pinia'
 import $ from 'jquery'
 
+const base = import.meta.env.BASE_URL
 const router = useRouter()
-const isLoggedIn = ref(!!localStorage.getItem('jwt_token'))
 
-// Watch for login/logout updates
-const updateLoginStatus = () => {
-  isLoggedIn.value = !!localStorage.getItem('jwt_token')
-}
-
-// Listen to custom event
-const onStorageChange = () => updateLoginStatus()
-
-onMounted(() => {
-  window.addEventListener('storage-change', onStorageChange)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('storage-change', onStorageChange)
-})
+// ✅ Use reactive store
+const authStore = useAuthStore()
+const { isLoggedIn } = storeToRefs(authStore)
 
 function onLogout() {
   logout()
-  updateLoginStatus()
-  window.dispatchEvent(new Event('storage-change'))
+  authStore.logout() // ✅ update the store properly
   router.push({ name: 'login' })
 }
 
+// collapse navbar on nav click (jQuery workaround)
 onMounted(() => {
-  $(document).ready(function () {
+  nextTick(() => {
+    console.log("ready")
     $('.dropdown-item, .single, .nav-link').on('click', function () {
+      $('#navbarSupportedContent').removeClass('show')
+    })
+
+    $(document).on('click', '.nav-link', function () {
       $('#navbarSupportedContent').removeClass('show')
     })
   })

@@ -8,7 +8,7 @@
             </div>
             <div class="p-field">
                 <label for="password">Password:</label>
-                <Password id="password" v-model="password" toggleMask class="full-width" />
+                <Password id="password" v-model="password" toggleMask class="full-width" :feedback="false" />
             </div>
             <Button type="submit" label="Sign In" class="p-button-rounded p-button-success full-width" />
         </form>

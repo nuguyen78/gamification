@@ -1,6 +1,7 @@
 // src/api/authService.ts
 import axios from 'axios'
 import router from '@/router'
+import { useAuthStore } from '@/stores/authStore'
 
 const api = axios.create({
   baseURL: 'https://l2pevents.cz/gamification',
@@ -35,11 +36,24 @@ export interface RegisterData {
   nick: string
 }
 
-export function login(data: LoginData): Promise<string> {
+/* export function login(data: LoginData): Promise<string> {
   return api.post<{ token: string }>('/login.php', data).then(res => {
     const token = res.data.token
     localStorage.setItem('jwt_token', token)
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+    return token
+  })
+} */
+
+export function login(
+  data: LoginData,
+  authStore: { login: (token: string) => void },
+): Promise<string> {
+  return api.post<{ token: string }>('/login.php', data).then(res => {
+    const token = res.data.token
+    localStorage.setItem('jwt_token', token)
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+    authStore.login(token) // ✅ using correct instance
     return token
   })
 }

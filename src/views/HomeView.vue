@@ -5,15 +5,41 @@
       Level up your character and earn real discounts at the bar. Play, compete, and drink with style!
     </p>
     <p>This game is still in demo version so please be patient and report any bugs to anyone eligible.</p>
-    <div class="logo-row">
-      <img src="@/assets/images/sova_horde.png" alt="Horde Logo" class="faction-logo" />
-      <img src="@/assets/images/sova_aliance.png" alt="Alliance Logo" class="faction-logo" />
+    <div v-if="loading" class="loading-screen">
+      <i class="pi pi-spin pi-spinner" style="font-size: 15rem;color: gray;"></i>
+    </div>
+    <div v-else class="logo-row">
+      <img :src="`${base}images/sova_horde.png`" alt="Horde Logo" class="faction-logo" />
+      <img :src="`${base}images/sova_aliance.png`" alt="Alliance Logo" class="faction-logo" />
     </div>
   </main>
 </template>
 
 <script setup lang="ts">
-// no extra logic needed here
+import { ref, onMounted } from 'vue'
+
+const base = import.meta.env.BASE_URL;
+const loading = ref(true)
+
+const preloadImage = (url: string) => {
+  return new Promise(resolve => {
+    const img = new Image()
+    img.onload = resolve
+    img.src = url
+  })
+}
+
+onMounted(async () => {
+  loading.value = true
+  const sova_horde = `${base}images/sova_horde.png`
+  const sova_aliance = `${base}images/sova_aliance.png`
+
+  await Promise.all([
+    preloadImage(sova_horde),
+    preloadImage(sova_aliance)
+  ])
+  loading.value = false
+})
 </script>
 
 <style scoped>

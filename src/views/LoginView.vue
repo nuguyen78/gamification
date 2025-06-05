@@ -9,32 +9,34 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { login } from '@/api/authService';
-import LoginForm from '@/components/auth/LoginForm.vue';
+import { defineComponent, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { login } from '@/api/authService'
+import LoginForm from '@/components/auth/LoginForm.vue'
+import { useAuthStore } from '@/stores/authStore' // ✅ import the store
 
 export default defineComponent({
     name: 'LoginView',
     components: { LoginForm },
     setup() {
-        const error = ref<string | null>(null);
-        const router = useRouter();
+        const error = ref<string | undefined>(undefined)
+        const router = useRouter()
+        const authStore = useAuthStore() // ✅ get the instance
 
         const onSubmit = async ({ email, password }: { email: string; password: string }) => {
-            error.value = null;
+            error.value = undefined
             try {
-                await login({ email, password });
-                window.dispatchEvent(new Event('storage-change'))
-                router.push({ name: 'faq' });
+                await login({ email, password }, authStore) // ✅ pass store here
+                router.push({ name: 'faq' })
             } catch {
-                error.value = 'Invalid login credentials';
+                error.value = 'Invalid login credentials'
             }
-        };
+        }
 
-        return { error, onSubmit };
+        return { error, onSubmit }
     }
-});
+})
+
 </script>
 
 <style scoped>

@@ -16,8 +16,7 @@
             <!-- Icon Column -->
             <Column header="Icon" style="width:3rem;text-align:center;" class="icon-column">
                 <template #body="{ data }">
-                    <img :src="slotIconMap[data.slot] || '/src/assets/images/warrior.webp'" :alt="data.slot"
-                        class="item-icon" />
+                    <img :src="slotIconMap[data.slot]" :alt="data.slot" class="item-icon" />
                 </template>
             </Column>
 
@@ -81,8 +80,7 @@
         </DataTable>
 
         <!-- Mobile Table with only global search -->
-        <DataTable v-else :value="ownItems" tableStyle="min-width:30rem" class="mobile-table"
-            @row-click="showItemDetails" responsiveLayout="scroll">
+        <DataTable v-else :value="ownItems" class="mobile-table" @row-click="showItemDetails" responsiveLayout="scroll">
             <!-- Global Search -->
             <template #header>
                 <div class="flex justify-end">
@@ -92,8 +90,7 @@
 
             <Column header="Icon" style="width:3rem;text-align:center;" class="icon-column">
                 <template #body="{ data }">
-                    <img :src="slotIconMap[data.slot] || '/src/assets/images/warrior.webp'" :alt="data.slot"
-                        class="item-icon" />
+                    <img :src="slotIconMap[data.slot]" :alt="data.slot" class="item-icon" />
                 </template>
             </Column>
 
@@ -126,8 +123,9 @@ import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
 import Dialog from 'primevue/dialog'
 
+const base = import.meta.env.BASE_URL;
+
 const playerStore = usePlayerStore()
-const CHARACTER_ID = 1
 
 const isMobile = ref(false)
 const visible = ref(false)
@@ -155,15 +153,15 @@ const filters = ref({
 })
 
 const slotIconMap: Record<string, string> = {
-    helmet: 'src/assets/images/helmet2.png',
-    shoulders: 'src/assets/images/shoulders.png',
-    cloak: 'src/assets/images/cloak.png',
-    chest: 'src/assets/images/chest.png',
-    gloves: 'src/assets/images/gloves.png',
-    legs: 'src/assets/images/legs.png',
-    feet: 'src/assets/images/feet.png',
-    ring: 'src/assets/images/ring.png',
-    weapon: 'src/assets/images/sword_icon2.webp'
+    helmet: `${base}images/helmet2.png`,
+    shoulders: `${base}images/shoulders.png`,
+    cloak: `${base}images/cloak.png`,
+    chest: `${base}images/chest.png`,
+    gloves: `${base}images/gloves.png`,
+    legs: `${base}images/legs.png`,
+    feet: `${base}images/feet.png`,
+    ring: `${base}images/ring.png`,
+    weapon: `${base}images/sword_icon2.webp`
 }
 
 // Determine if it's mobile
