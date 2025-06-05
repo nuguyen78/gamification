@@ -29,14 +29,12 @@
     </DataTable>
 
     <!-- Modal for Mobile -->
-    <Dialog v-model:visible="visible" modal header="Item Details" :style="{ width: '80vw' }" :dismissableMask="true">
-      <div v-if="selectedItem">
-        <p><strong>Slot:</strong> {{ selectedItem.slot }}</p>
-        <p><strong>Name:</strong> {{ selectedItem.name }}</p>
-        <p><strong>Description:</strong> {{ selectedItem.description }}</p>
-        <p><strong>Stats:</strong> {{ selectedItem.stats }}</p>
-      </div>
-    </Dialog>
+    <ReusableModal v-model:visible="visible" :header="'Item Details'" :item="selectedItem" :fields="{
+      Slot: 'slot',
+      Name: 'name',
+      Description: 'description',
+      Stats: 'stats'
+    }" />
   </div>
 </template>
 
@@ -46,6 +44,7 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Dialog from 'primevue/dialog'
 import { usePlayerStore } from '@/stores/mainStore'
+import ReusableModal from '@/components/ReusableModal.vue'
 
 const base = import.meta.env.BASE_URL;
 // Reactive state for modal and selected item

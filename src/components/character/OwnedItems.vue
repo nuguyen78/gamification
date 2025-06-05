@@ -98,18 +98,17 @@
         </DataTable>
 
         <!-- Modal for Mobile Details -->
-        <Dialog v-model:visible="visible" modal header="Item Details" :style="{ width: '80vw' }"
-            :dismissableMask="true">
-            <div v-if="selectedItem">
-                <p><strong>Slot:</strong> {{ selectedItem.slot }}</p>
-                <p><strong>Name:</strong> {{ selectedItem.name }}</p>
-                <p><strong>Description:</strong> {{ selectedItem.description }}</p>
-                <p><strong>Stats:</strong> {{ selectedItem.stats }}</p>
-                <p><strong>Discount:</strong> {{ selectedItem.discount }}</p>
-                <Button label="Equip" :loading="loadingId === selectedItem.item_id"
-                    @click="onEquip(selectedItem.item_id)" />
-            </div>
-        </Dialog>
+        <ReusableModal v-model:visible="visible" :header="'Item Details'" :item="selectedItem" :fields="{
+            Slot: 'slot',
+            Name: 'name',
+            Description: 'description',
+            Stats: 'stats',
+            Discount: 'discount'
+        }">
+            <template #footer="{ item }">
+                <Button label="Equip" :loading="loadingId === item.item_id" @click="onEquip(item.item_id)" />
+            </template>
+        </ReusableModal>
     </div>
 </template>
 
@@ -121,7 +120,7 @@ import Column from 'primevue/column'
 import { FilterMatchMode } from '@primevue/core/api'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
-import Dialog from 'primevue/dialog'
+import ReusableModal from '@/components/ReusableModal.vue'
 
 const base = import.meta.env.BASE_URL;
 

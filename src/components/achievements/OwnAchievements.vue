@@ -65,15 +65,12 @@
         </DataTable>
 
         <!-- Modal -->
-        <Dialog v-model:visible="visible" modal header="Achievement Details" :style="{ width: '80vw' }"
-            :dismissableMask="true">
-            <div v-if="selectedAchievement">
-                <p><strong>Name:</strong> {{ selectedAchievement.name }}</p>
-                <p><strong>Description:</strong> {{ selectedAchievement.description }}</p>
-                <p><strong>Remaining:</strong> {{ selectedAchievement.remaining }}</p>
-                <p><strong>Status:</strong> {{ getStatusLabel(selectedAchievement.status) }}</p>
-            </div>
-        </Dialog>
+        <ReusableModal v-model:visible="visible" :header="'Achievement Details'" :item="selectedAchievement" :fields="{
+            Name: 'name',
+            Description: 'description',
+            Remaining: 'remaining',
+            Status: (item: any) => getStatusLabel(item.status)
+        }" />
     </div>
 </template>
 
@@ -84,9 +81,9 @@ import Column from 'primevue/column'
 import InputText from 'primevue/inputtext'
 import Dropdown from 'primevue/dropdown'
 import Button from 'primevue/button'
-import Dialog from 'primevue/dialog'
 import { usePlayerStore } from '@/stores/mainStore'
 import { FilterMatchMode } from '@primevue/core/api'
+import ReusableModal from '@/components/ReusableModal.vue'
 
 const playerStore = usePlayerStore()
 
